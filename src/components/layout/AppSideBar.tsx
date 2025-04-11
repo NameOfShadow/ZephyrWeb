@@ -35,7 +35,7 @@ const data = {
         },
         {
             title: "GitHub",
-            url: "https://github.com",
+            url: "https://github.com/NameOfShadow/ZephyrWeb",
             icon: Github,
             isActive: false,
         },
