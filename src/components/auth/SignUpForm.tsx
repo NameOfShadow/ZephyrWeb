@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import SignInWithGoogleButton from "@/components/SignInWithGoogleButton";
-import SignInWithAppleButton from "@/components/SignInWithAppleButton";
+import SignInWithGoogleButton from "@/components/ui/SignInWithGoogleButton";
+import SignInWithAppleButton from "@/components/ui/SignInWithAppleButton";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -55,17 +55,16 @@ export function SignUpForm({
 
         startTransition(async () => {
             try {
-                const result = await signup({formData: data});
+                const formData = new FormData();
+                formData.append("email", data.email);
+                formData.append("password", data.password);
+                formData.append("full_name", data.full_name);
 
+
+                const result = await signup(formData);
+//
                 if (result?.error) {
-                    if (result.error.field) {
-                        setError(result.error.field as keyof FormFields, {
-                            type: "server",
-                            message: result.error.message
-                        });
-                    } else {
-                        setServerError(result.error.message);
-                    }
+                    setServerError(result.error.message);
                 }
             } catch (error) {
                 setServerError("An unexpected error occurred. Please try again.");

@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter()
+    const pathname = usePathname()
     const supabase = createClient()
 
     useEffect(() => {
@@ -22,8 +23,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
             }
         }
 
-        checkAuth()
-    }, [router, supabase])
+        // Не проверяем аутентификацию на странице /signup
+        if (pathname !== '/signup') {
+            checkAuth()
+        }
+    }, [router, supabase, pathname]) // Добавляем pathname в зависимости
 
     return <>{children}</>
 }

@@ -10,8 +10,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { login } from "@/lib/auth-actions"
-import SignInWithGoogleButton from "@/components/SignInWithGoogleButton";
-import SignInWithAppleButton from "@/components/SignInWithAppleButton";
+import SignInWithGoogleButton from "@/components/ui/SignInWithGoogleButton";
+import SignInWithAppleButton from "@/components/ui/SignInWithAppleButton";
 
 export function LoginForm({
                               className,

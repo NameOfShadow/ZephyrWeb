@@ -1,54 +1,100 @@
-'use client';
+"use client"
 
-import { createClient } from "@/utils/supabase/client";
-import React, { useEffect, useState } from "react";
+export default function Page() {
+    const [selectedUser, setSelectedUser] = useState<{
+        id: string
+        name: string
+        email: string
+        avatar: string
+    } | null>(null)
 
-export default function Home() {
-    const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const supabase = createClient();
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const { data: { user }, error } = await supabase.auth.getUser();
-
-                if (error) throw error;
-                setUser(user);
-            } catch (error) {
-                console.error("Error fetching user:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUser();
-    }, []);
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-            </div>
-        );
-    }
-
-    if (!user) {
-        return (
-            <div className="text-center py-8">
-                <p>Please log in to view this content</p>
-            </div>
-        );
+    const handleUserSelect = (user: IUser) => {
+        setSelectedUser({
+            id: user.id,
+            name: user.full_name,
+            email: user.email,
+            avatar: user.avatar_url
+        })
     }
 
     return (
-        <div className="p-4">
-            <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-                Hello&nbsp;
-                <code className="font-mono font-bold">
-                    {user.user_metadata?.full_name || "User"}
-                </code>
-            </p>
-        </div>
-    );
+        <SidebarProvider
+            style={{
+                "--sidebar-width": "350px",
+            } as React.CSSProperties}
+        >
+            <AppSideBar onUserSelect={handleUserSelect}/>
+            <SidebarInset className="flex flex-col">
+                {selectedUser && (
+                    <>
+                        {/* Шапка с информацией о пользователе */}
+                        <header className="sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4">
+                            <div className="flex items-center gap-3">
+                                {selectedUser.avatar ? (
+                                    <img
+                                        src={selectedUser.avatar}
+                                        alt="Avatar"
+                                        className="h-8 w-8 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-medium">
+                                        {selectedUser.name[0]?.toUpperCase() || '?'}
+                                    </div>
+                                )}
+                                <Separator orientation="vertical" className="h-4" />
+                                <Breadcrumb>
+                                    <BreadcrumbList>
+                                        <BreadcrumbItem>
+                                            {selectedUser.name}
+                                        </BreadcrumbItem>
+                                    </BreadcrumbList>
+                                </Breadcrumb>
+                            </div>
+                        </header>
+
+                        {/* Окно чата */}
+                        <ChatWindow
+                            receiverId={selectedUser.id}
+                            className="flex-1 overflow-hidden"
+                        />
+                    </>
+                )}
+
+                {/* Состояние когда пользователь не выбран */}
+                {!selectedUser && (
+                    <div className="flex-1 flex items-center justify-center p-4">
+                        <div className="text-center text-muted-foreground">
+                            <p className="text-lg font-medium">Select a chat to start messaging</p>
+                            <p className="text-sm mt-2">Choose a contact from the sidebar</p>
+                        </div>
+                    </div>
+                )}
+            </SidebarInset>
+        </SidebarProvider>
+    )
 }
+
+import { AppSideBar } from "@/components/layout/AppSideBar"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
+import {
+    SidebarInset,
+    SidebarProvider,
+} from "@/components/ui/sidebar"
+import React, { useState } from "react"
+import { ChatWindow } from "@/components/chat/ChatWindow" // Импортируем компонент чата
+
+interface IUser {
+    id: string
+    full_name: string
+    email: string
+    avatar_url: string
+}
+

@@ -1,7 +1,7 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import {Geist, Geist_Mono, Inter} from "next/font/google";
-import AuthProvider from "@/components/AuthProvider";
+import AuthProvider from "@/components/auth/AuthProvider";
 
 import "./globals.css";
 
@@ -34,7 +34,9 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body className={inter.className}>
-        {children}
+        <AuthProvider>
+            {children}
+        </AuthProvider>
         </body>
         </html>
     )
